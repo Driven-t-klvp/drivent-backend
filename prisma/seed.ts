@@ -16,7 +16,63 @@ async function main() {
     });
   }
 
+  await prisma.ticketType.deleteMany();
+
+  let ticketType = await prisma.ticketType.findFirst({
+    where: {
+      isRemote: true,
+      includesHotel: false,
+    },
+  });
+  if (!ticketType) {
+    ticketType = await prisma.ticketType.create({
+      data: {
+        name: 'online ticket',
+        price: 100,
+        isRemote: true,
+        includesHotel: false,
+      },
+    });
+  }
+
+  let ticketType2 = await prisma.ticketType.findFirst({
+    where: {
+      isRemote: false,
+      includesHotel: false,
+    },
+  });
+  if (!ticketType2) {
+    ticketType2 = await prisma.ticketType.create({
+      data: {
+        name: 'Presencial sem hotel',
+        price: 250,
+        isRemote: false,
+        includesHotel: false,
+      },
+    });
+  }
+
+  let ticketType3 = await prisma.ticketType.findFirst({
+    where: {
+      isRemote: false,
+      includesHotel: true,
+    },
+  });
+  if (!ticketType3) {
+    ticketType3 = await prisma.ticketType.create({
+      data: {
+        name: 'Presencial com hotel',
+        price: 350,
+        isRemote: false,
+        includesHotel: true,
+      },
+    });
+  }
+
   console.log({ event });
+  console.log({ ticketType });
+  console.log({ ticketType2 });
+  console.log({ ticketType3 });
 }
 
 main()
