@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Ticket } from '@prisma/client';
 import dayjs from 'dayjs';
 const prisma = new PrismaClient();
 
@@ -18,14 +18,14 @@ async function main() {
 
   await prisma.ticketType.deleteMany();
 
-  let ticketType = await prisma.ticketType.findFirst({
+  let remoteTicketType = await prisma.ticketType.findFirst({
     where: {
       isRemote: true,
       includesHotel: false,
     },
   });
-  if (!ticketType) {
-    ticketType = await prisma.ticketType.create({
+  if (!remoteTicketType) {
+    remoteTicketType = await prisma.ticketType.create({
       data: {
         name: 'online ticket',
         price: 100,
@@ -35,14 +35,14 @@ async function main() {
     });
   }
 
-  let ticketType2 = await prisma.ticketType.findFirst({
+  let presencialTicketType = await prisma.ticketType.findFirst({
     where: {
       isRemote: false,
       includesHotel: false,
     },
   });
-  if (!ticketType2) {
-    ticketType2 = await prisma.ticketType.create({
+  if (presencialTicketType) {
+    presencialTicketType = await prisma.ticketType.create({
       data: {
         name: 'Presencial sem hotel',
         price: 250,
@@ -52,14 +52,14 @@ async function main() {
     });
   }
 
-  let ticketType3 = await prisma.ticketType.findFirst({
+  let hotelTicketType = await prisma.ticketType.findFirst({
     where: {
       isRemote: false,
       includesHotel: true,
     },
   });
-  if (!ticketType3) {
-    ticketType3 = await prisma.ticketType.create({
+  if (!hotelTicketType) {
+    hotelTicketType = await prisma.ticketType.create({
       data: {
         name: 'Presencial com hotel',
         price: 350,
@@ -69,10 +69,60 @@ async function main() {
     });
   }
 
+  let user = await prisma.user.findFirst();
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: 'test@gmail.com',
+        password: '123456',
+      },
+    });
+  }
+
+  let enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id } });
+  if (!enrollment) {
+    enrollment = await prisma.enrollment.create({
+      data: {
+        name: 'John Travolta',
+        cpf: '47424943006',
+        birthday: new Date('1990-05-04'),
+        phone: '129985430293',
+        userId: user.id,
+      },
+    });
+  }
+
+  let ticketWithHotel = await prisma.ticket.findFirst({
+    where: {
+      enrollmentId: enrollment.id,
+      TicketType: {
+        includesHotel: true,
+      },
+    },
+    include: {
+      TicketType: true,
+    },
+  });
+  if (!ticketWithHotel) {
+    ticketWithHotel = await prisma.ticket.create({
+      data: {
+        ticketTypeId: hotelTicketType.id,
+        enrollmentId: enrollment.id,
+        status: 'PAID',
+      },
+      include: {
+        TicketType: true,
+      },
+    });
+  }
+
   console.log({ event });
-  console.log({ ticketType });
-  console.log({ ticketType2 });
-  console.log({ ticketType3 });
+  console.log({ remoteTicketType });
+  console.log({ presencialTicketType });
+  console.log({ hotelTicketType });
+  console.log({ user });
+  console.log({ enrollment });
+  console.log({ ticketWithHotel });
 }
 
 main()
