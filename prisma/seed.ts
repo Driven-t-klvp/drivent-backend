@@ -41,7 +41,7 @@ async function main() {
       includesHotel: false,
     },
   });
-  if (presencialTicketType) {
+  if (!presencialTicketType) {
     presencialTicketType = await prisma.ticketType.create({
       data: {
         name: 'Presencial sem hotel',
