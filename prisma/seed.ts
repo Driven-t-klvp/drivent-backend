@@ -1,5 +1,7 @@
 import { PrismaClient, Ticket } from '@prisma/client';
 import dayjs from 'dayjs';
+import hotelsSeed from './HotelsSeed';
+import roomsSeed from './RoomsandBookingsSeed';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -116,6 +118,16 @@ async function main() {
     });
   }
 
+  let hotels = await prisma.hotel.findMany();
+  if (!hotels || hotels.length === 0) {
+    hotels = await hotelsSeed.createHotels(prisma);
+  }
+
+  let rooms = await prisma.room.findMany();
+  if (!rooms || rooms.length === 0) {
+    await roomsSeed.createRoomsandBookings(prisma, hotels);
+  }
+
   console.log({ event });
   console.log({ remoteTicketType });
   console.log({ presencialTicketType });
@@ -123,6 +135,7 @@ async function main() {
   console.log({ user });
   console.log({ enrollment });
   console.log({ ticketWithHotel });
+  console.log({ hotels });
 }
 
 main()
