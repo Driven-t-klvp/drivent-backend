@@ -1,5 +1,8 @@
 import { PrismaClient, Ticket } from '@prisma/client';
 import dayjs from 'dayjs';
+import faker from '@faker-js/faker';
+import { generateCPF, getStates } from '@brazilian-utils/brazilian-utils';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -79,18 +82,38 @@ async function main() {
     });
   }
 
+  //Comente ou altera essa parte do seed caso não queira enrrolment inserido
+  await prisma.enrollment.deleteMany();
+
   let enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id } });
   if (!enrollment) {
     enrollment = await prisma.enrollment.create({
       data: {
-        name: 'John Travolta',
-        cpf: '47424943006',
-        birthday: new Date('1990-05-04'),
-        phone: '129985430293',
+        name: faker.name.findName(),
+        cpf: generateCPF(),
+        birthday: faker.date.past(),
+        phone: faker.phone.phoneNumber('(##) 9####-####'),
         userId: user.id,
+        Address: {
+          create: {
+            street: faker.address.streetName(),
+            cep: faker.address.zipCode(),
+            city: faker.address.city(),
+            neighborhood: faker.address.city(),
+            number: faker.datatype.number().toString(),
+            state: faker.helpers.arrayElement(getStates()).name,
+          },
+        },
+      },
+      include: {
+        Address: true,
       },
     });
   }
+
+
+  //Comente ou altera essa parte do seed caso não queira inserir ticket RESERVED
+  await prisma.ticket.deleteMany();
 
   let ticketWithHotel = await prisma.ticket.findFirst({
     where: {
@@ -108,7 +131,7 @@ async function main() {
       data: {
         ticketTypeId: hotelTicketType.id,
         enrollmentId: enrollment.id,
-        status: 'PAID',
+        status: 'RESERVED',
       },
       include: {
         TicketType: true,
@@ -116,13 +139,6 @@ async function main() {
     });
   }
 
-  console.log({ event });
-  console.log({ remoteTicketType });
-  console.log({ presencialTicketType });
-  console.log({ hotelTicketType });
-  console.log({ user });
-  console.log({ enrollment });
-  console.log({ ticketWithHotel });
 }
 
 main()
