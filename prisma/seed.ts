@@ -3,6 +3,8 @@ import dayjs from 'dayjs';
 import faker from '@faker-js/faker';
 import { generateCPF, getStates } from '@brazilian-utils/brazilian-utils';
 
+import hotelsSeed from './HotelsSeed';
+import roomsSeed from './RoomsandBookingsSeed';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -139,6 +141,24 @@ async function main() {
     });
   }
 
+  let hotels = await prisma.hotel.findMany();
+  if (!hotels || hotels.length === 0) {
+    hotels = await hotelsSeed.createHotels(prisma);
+  }
+
+  let rooms = await prisma.room.findMany();
+  if (!rooms || rooms.length === 0) {
+    await roomsSeed.createRoomsandBookings(prisma, hotels);
+  }
+
+  console.log({ event });
+  console.log({ remoteTicketType });
+  console.log({ presencialTicketType });
+  console.log({ hotelTicketType });
+  console.log({ user });
+  console.log({ enrollment });
+  console.log({ ticketWithHotel });
+  console.log({ hotels });
 }
 
 main()
