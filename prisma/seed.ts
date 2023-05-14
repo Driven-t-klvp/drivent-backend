@@ -84,68 +84,13 @@ async function main() {
     });
   }
 
-  //Comente ou altera essa parte do seed caso não queira enrrolment inserido
-  await prisma.enrollment.deleteMany();
-
-  let enrollment = await prisma.enrollment.findFirst({ where: { userId: user.id } });
-  if (!enrollment) {
-    enrollment = await prisma.enrollment.create({
-      data: {
-        name: faker.name.findName(),
-        cpf: generateCPF(),
-        birthday: faker.date.past(),
-        phone: faker.phone.phoneNumber('(##) 9####-####'),
-        userId: user.id,
-        Address: {
-          create: {
-            street: faker.address.streetName(),
-            cep: faker.address.zipCode(),
-            city: faker.address.city(),
-            neighborhood: faker.address.city(),
-            number: faker.datatype.number().toString(),
-            state: faker.helpers.arrayElement(getStates()).name,
-          },
-        },
-      },
-      include: {
-        Address: true,
-      },
-    });
-  }
-
-
-  //Comente ou altera essa parte do seed caso não queira inserir ticket RESERVED
-  await prisma.ticket.deleteMany();
-
-  let ticketWithHotel = await prisma.ticket.findFirst({
-    where: {
-      enrollmentId: enrollment.id,
-      TicketType: {
-        includesHotel: true,
-      },
-    },
-    include: {
-      TicketType: true,
-    },
-  });
-  if (!ticketWithHotel) {
-    ticketWithHotel = await prisma.ticket.create({
-      data: {
-        ticketTypeId: hotelTicketType.id,
-        enrollmentId: enrollment.id,
-        status: 'RESERVED',
-      },
-      include: {
-        TicketType: true,
-      },
-    });
-  }
-
+  await prisma.hotel.deleteMany();
   let hotels = await prisma.hotel.findMany();
   if (!hotels || hotels.length === 0) {
     hotels = await hotelsSeed.createHotels(prisma);
   }
 
+  await prisma.room.deleteMany();
   let rooms = await prisma.room.findMany();
   if (!rooms || rooms.length === 0) {
     await roomsSeed.createRoomsandBookings(prisma, hotels);
@@ -156,8 +101,6 @@ async function main() {
   console.log({ presencialTicketType });
   console.log({ hotelTicketType });
   console.log({ user });
-  console.log({ enrollment });
-  console.log({ ticketWithHotel });
   console.log({ hotels });
 }
 
