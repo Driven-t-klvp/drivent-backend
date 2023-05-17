@@ -14,7 +14,7 @@ async function createHotels(prisma: PrismaClient) {
           'https://cdn.falauniversidades.com.br/wp-content/uploads/2019/06/Hogwarts-School-of-Witchcraft-and-Wizardry.jpg',
       },
       {
-        name: 'Xablau',
+        name: 'Heanvenly palace',
         image: 'https://i.pinimg.com/550x/02/8c/e3/028ce3de4fcc71dc130d17fec02bcfdc.jpg',
       },
     ],
