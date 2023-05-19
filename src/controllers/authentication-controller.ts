@@ -13,3 +13,17 @@ export async function singInPost(req: Request, res: Response) {
     return res.status(httpStatus.UNAUTHORIZED).send({});
   }
 }
+
+type GitHubCode = { code: string };
+
+export async function singInGitHub(req: Request, res: Response) {
+  const { code } = req.body as GitHubCode;
+
+  try {
+    const result = await authenticationService.signInGitHub(code);
+
+    return res.status(httpStatus.OK).send(result);
+  } catch (error) {
+    return res.status(httpStatus.UNAUTHORIZED).send({});
+  }
+}
