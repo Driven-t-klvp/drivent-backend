@@ -69,8 +69,7 @@ async function main() {
         isRemote: false,
         includesHotel: true,
         fullActivityAccess: true,
-      },
-    });
+    }});
   }
 
   let user = await prisma.user.findFirst();
