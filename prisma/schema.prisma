@@ -32,14 +32,15 @@ model Session {
 }
 
 model Event {
-  id                 Int      @id @default(autoincrement())
-  title              String   @db.VarChar(255)
-  backgroundImageUrl String   @db.VarChar(255)
-  logoImageUrl       String   @db.VarChar(255)
+  id                 Int                @id @default(autoincrement())
+  title              String             @db.VarChar(255)
+  backgroundImageUrl String             @db.VarChar(255)
+  logoImageUrl       String             @db.VarChar(255)
   startsAt           DateTime
   endsAt             DateTime
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  ActivityLocation   ActivityLocation[]
 }
 
 model Enrollment {
@@ -143,4 +144,23 @@ model Booking {
 model Teste {
   id   Int    @id @default(autoincrement())
   name String
+}
+
+model Activity {
+  id         Int              @id @default(autoincrement())
+  startsAt   DateTime         @db.Timestamptz(0)
+  endsAt     DateTime         @db.Timestamptz(0)
+  name       String
+  locationId Int
+  Location   ActivityLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([startsAt, locationId])
+}
+
+model ActivityLocation {
+  id       Int        @id @default(autoincrement())
+  name     String
+  eventId  Int
+  Event    Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  Activity Activity[]
 }
