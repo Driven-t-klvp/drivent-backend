@@ -1,7 +1,5 @@
-import { PrismaClient, Ticket } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import dayjs from 'dayjs';
-import faker from '@faker-js/faker';
-import { generateCPF, getStates } from '@brazilian-utils/brazilian-utils';
 
 import hotelsSeed from './HotelsSeed';
 import roomsSeed from './RoomsandBookingsSeed';
@@ -70,6 +68,7 @@ async function main() {
         price: 350,
         isRemote: false,
         includesHotel: true,
+        fullActivityAccess: true,
       },
     });
   }

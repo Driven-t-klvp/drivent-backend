@@ -73,14 +73,15 @@ model Address {
 }
 
 model TicketType {
-  id            Int      @id @default(autoincrement())
-  name          String   @db.VarChar(255)
-  price         Int
-  isRemote      Boolean
-  includesHotel Boolean
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  Ticket        Ticket[]
+  id                 Int      @id @default(autoincrement())
+  name               String   @db.VarChar(255)
+  price              Int
+  isRemote           Boolean
+  includesHotel      Boolean
+  fullActivityAccess Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  Ticket             Ticket[]
 }
 
 model Ticket {
@@ -151,6 +152,7 @@ model Activity {
   startsAt   DateTime         @db.Timestamptz(0)
   endsAt     DateTime         @db.Timestamptz(0)
   name       String
+  openSeats  Int
   locationId Int
   Location   ActivityLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
