@@ -3,6 +3,8 @@ import dayjs from 'dayjs';
 
 import hotelsSeed from './HotelsSeed';
 import roomsSeed from './RoomsandBookingsSeed';
+import { createActivities, getActivityLocations } from './ActivitySeed';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -11,7 +13,7 @@ async function main() {
     event = await prisma.event.create({
       data: {
         title: 'Driven.t',
-        logoImageUrl: 'https://files.driveneducation.com.br/images/logo-rounded.png',
+        logoImageUrl: 'https:files.driveneducation.com.br/images/logo-rounded.png',
         backgroundImageUrl: 'linear-gradient(to right, #FA4098, #FFD77F)',
         startsAt: dayjs().toDate(),
         endsAt: dayjs().add(21, 'days').toDate(),
@@ -69,7 +71,8 @@ async function main() {
         isRemote: false,
         includesHotel: true,
         fullActivityAccess: true,
-    }});
+      },
+    });
   }
 
   let user = await prisma.user.findFirst();
@@ -94,6 +97,21 @@ async function main() {
     await roomsSeed.createRoomsandBookings(prisma, hotels);
   }
 
+  let activityLocations = await prisma.activityLocation.findMany();
+  if (!activityLocations.length) {
+    await prisma.activityLocation.createMany({ data: getActivityLocations(event.id) });
+    activityLocations = await prisma.activityLocation.findMany();
+  }
+
+  const activities = await prisma.activity.findFirst();
+
+  if (!activities) {
+    await prisma.activity.createMany({
+      data: createActivities(activityLocations, event),
+    });
+  }
+
+  console.log({ activityLocations });
   console.log({ event });
   console.log({ remoteTicketType });
   console.log({ presencialTicketType });
