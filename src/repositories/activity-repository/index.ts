@@ -8,6 +8,9 @@ async function findActivitiesByDate(minDate: Date, maxDate: Date) {
         gt: minDate,
       },
     },
+    orderBy: {
+      startsAt: 'asc',
+    },
   });
 }
 
