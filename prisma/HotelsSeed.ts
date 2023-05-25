@@ -5,8 +5,7 @@ async function createHotels(prisma: PrismaClient) {
     data: [
       {
         name: 'Hotel da Peppa',
-        image:
-          'https://static.wikia.nocookie.net/peppapedia/images/6/62/Casa_da_peppa.jpg/revision/latest/scale-to-width-down/350?cb=20170127184613&path-prefix=pt-br',
+        image: 'https://images.uncyc.org/pt/thumb/6/6e/Casa_da_peppa.png/600px-Casa_da_peppa.png',
       },
       {
         name: 'Hogwarts',
