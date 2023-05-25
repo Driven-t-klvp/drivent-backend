@@ -25,3 +25,28 @@ export async function listActivityLocations(req: AuthenticatedRequest, res: Resp
     next(error);
   }
 }
+
+export async function subscribeActivity(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  const { userId } = req;
+  const { activityId } = req.body;
+
+  try {
+    const userActivity = await activitiesService.subscribeActivity({ userId, activityId });
+    return res.status(httpStatus.OK).send(userActivity);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function unsubscribeActivity(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  const { userId } = req;
+  const { id } = req.params;
+  const activityId = parseInt(id);
+
+  try {
+    await activitiesService.unsubscribeActivity({ userId, activityId });
+    return res.status(httpStatus.NO_CONTENT).send();
+  } catch (error) {
+    next(error);
+  }
+}
