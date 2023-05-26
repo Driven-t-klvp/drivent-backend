@@ -31,8 +31,8 @@ export async function subscribeActivity(req: AuthenticatedRequest, res: Response
   const { activityId } = req.body;
 
   try {
-    const userActivity = await activitiesService.subscribeActivity({ userId, activityId });
-    return res.status(httpStatus.OK).send(userActivity);
+    const ticketActivity = await activitiesService.subscribeActivity({ userId, activityId });
+    return res.status(httpStatus.OK).send(ticketActivity);
   } catch (error) {
     next(error);
   }

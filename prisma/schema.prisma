@@ -8,16 +8,15 @@ datasource db {
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  email          String?          @unique @db.VarChar(255)
-  password       String?          @db.VarChar(255)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  gitHubId       String?          @unique @db.VarChar(255)
-  Booking        Booking[]
-  Enrollment     Enrollment?
-  Session        Session[]
-  UserActivities UserActivities[]
+  id         Int         @id @default(autoincrement())
+  email      String?     @unique @db.VarChar(255)
+  password   String?     @db.VarChar(255)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  gitHubId   String?     @unique @db.VarChar(255)
+  Booking    Booking[]
+  Enrollment Enrollment?
+  Session    Session[]
 }
 
 model Session {
@@ -142,15 +141,14 @@ model Teste {
 }
 
 model Activity {
-  id             Int              @id @default(autoincrement())
-  startsAt       DateTime         @db.Timestamptz(0)
-  endsAt         DateTime         @db.Timestamptz(0)
-  name           String
-  openSeats      Int
-  locationId     Int
-  Location       ActivityLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  UserActivities UserActivities[]
-  Tickets        Ticket[]
+  id         Int              @id @default(autoincrement())
+  startsAt   DateTime         @db.Timestamptz(0)
+  endsAt     DateTime         @db.Timestamptz(0)
+  name       String
+  openSeats  Int
+  locationId Int
+  Location   ActivityLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  Tickets    Ticket[]
 
   @@unique([startsAt, locationId])
 }
@@ -161,15 +159,6 @@ model ActivityLocation {
   eventId  Int
   Event    Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
   Activity Activity[]
-}
-
-model UserActivities {
-  id         Int       @id @default(autoincrement())
-  userId     Int?
-  activityId Int?
-  createdAt  DateTime  @default(now())
-  Activity   Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  User       User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum TicketStatus {
