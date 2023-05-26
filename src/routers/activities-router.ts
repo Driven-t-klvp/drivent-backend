@@ -13,7 +13,7 @@ activitiesRouter
   .all('/*', authenticateToken)
   .get('/', listActivities)
   .post('/', subscribeActivity)
-  .delete('/userActivity/:id', unsubscribeActivity)
+  .delete('/ticketActivity/:id', unsubscribeActivity)
   .get('/locations', listActivityLocations);
 
 export { activitiesRouter };

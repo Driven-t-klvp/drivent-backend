@@ -1,6 +1,6 @@
 import { prisma } from '@/config';
 
-async function findActivitiesByDate(minDate: Date, maxDate: Date, userId: number) {
+async function findActivitiesByDate(minDate: Date, maxDate: Date, enrollmentId: number) {
   return prisma.activity.findMany({
     where: {
       startsAt: {
@@ -8,13 +8,8 @@ async function findActivitiesByDate(minDate: Date, maxDate: Date, userId: number
         gt: minDate,
       },
     },
-    include: {
-      UserActivities: {
-        where: {
-          userId,
-        },
-      },
-    },
+    include: { Tickets: { where: { enrollmentId } } },
+
     orderBy: {
       startsAt: 'asc',
     },
@@ -59,27 +54,30 @@ async function incrementActivitySeats(id: number) {
   });
 }
 
-async function findUserActivity(userId: number, activityId: number) {
-  return prisma.userActivities.findFirst({
+async function findTicketActivity(id: number, activityId: number) {
+  return prisma.activity.findFirst({
     where: {
-      userId,
-      activityId,
+      id: activityId,
     },
+    select: { Tickets: { where: { id } } },
   });
 }
 
-async function createUserActivity(userId: number, activityId: number) {
-  return prisma.userActivities.create({
-    data: {
-      userId,
-      activityId,
-    },
-  });
-}
-
-async function deleteUserActivity(id: number) {
-  return prisma.userActivities.delete({
+async function createTicketActivity(id: number, activityId: number) {
+  return prisma.ticket.update({
     where: { id },
+    data: {
+      Activities: { connect: [{ id: activityId }] },
+    },
+  });
+}
+
+async function deleteTicketActivity(id: number, activityId: number) {
+  return prisma.ticket.update({
+    where: { id },
+    data: {
+      Activities: { disconnect: [{ id: activityId }] },
+    },
   });
 }
 
@@ -88,10 +86,10 @@ const activityRepository = {
   findActivityLocations,
   findActivityById,
   reduceActivitySeats,
-  createUserActivity,
-  deleteUserActivity,
+  createTicketActivity,
+  deleteTicketActivity,
   incrementActivitySeats,
-  findUserActivity,
+  findTicketActivity,
 };
 
 export default activityRepository;
