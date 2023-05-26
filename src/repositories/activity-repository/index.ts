@@ -15,6 +15,39 @@ async function findActivitiesByDate(minDate: Date, maxDate: Date, enrollmentId: 
     },
   });
 }
+async function searchConflicTicketActivities(minDate: Date, maxDate: Date, enrollmentId: number) {
+  return prisma.activity.findMany({
+    where: {
+      OR: [
+        {
+          startsAt: {
+            lte: maxDate,
+            gte: minDate,
+          },
+        },
+        {
+          endsAt: {
+            lte: maxDate,
+            gte: minDate,
+          },
+        },
+        {
+          startsAt: {
+            lt: maxDate,
+          },
+          endsAt: {
+            gt: minDate,
+          },
+        },
+      ],
+    },
+    select: { Tickets: { where: { enrollmentId } } },
+
+    orderBy: {
+      startsAt: 'asc',
+    },
+  });
+}
 
 async function findActivityLocations() {
   return prisma.activityLocation.findMany();
@@ -90,6 +123,7 @@ const activityRepository = {
   deleteTicketActivity,
   incrementActivitySeats,
   findTicketActivity,
+  searchConflicTicketActivities,
 };
 
 export default activityRepository;

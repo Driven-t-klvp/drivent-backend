@@ -46,7 +46,18 @@ async function subscribeActivity({ userId, activityId }: { userId: number; activ
   const activity = await activityRepository.findActivityById(activityId);
   if (!activity) throw notFoundError();
 
-  if (activity.openSeats <= 0) throw forBiddenError();
+  const { openSeats, startsAt, endsAt } = activity;
+
+  if (openSeats <= 0) throw forBiddenError();
+
+  const possibleConflictActivities = await activityRepository.searchConflicTicketActivities(
+    startsAt,
+    endsAt,
+    enrollment.id,
+  );
+
+  const hasconflict = possibleConflictActivities.find((e) => e.Tickets.length > 0);
+  if (hasconflict) throw forBiddenError();
 
   await activityRepository.reduceActivitySeats(activityId);
   const ticketActivity = await activityRepository.createTicketActivity(ticket.id, activityId);
