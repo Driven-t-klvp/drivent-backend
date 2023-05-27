@@ -36,13 +36,33 @@ export function createActivities(activityLocations: ActivityLocation[], event: E
 
       if (isExistConflict) continue;
 
-      activitiesArray.push({
-        startsAt: startHour,
-        endsAt: endHour,
-        name,
-        locationId: randomLocationId,
-        openSeats,
-      });
+      if (
+        !activitiesArray.some(
+          (activity) =>
+            activity.startsAt.getUTCDate() === new Date(day).getUTCDate() &&
+            activity.locationId === randomLocationId &&
+            activity.startsAt.getUTCHours() === 9,
+        )
+      ) {
+        const initialActivityHour = getDateTime(day, true);
+
+        activitiesArray.push({
+          startsAt: initialActivityHour,
+          endsAt: new Date(initialActivityHour.getTime() + hourInMillis),
+          name,
+          locationId: randomLocationId,
+          openSeats,
+        });
+      } else {
+
+        activitiesArray.push({
+          startsAt: startHour,
+          endsAt: endHour,
+          name,
+          locationId: randomLocationId,
+          openSeats,
+        });
+      }
 
       i++;
     }
@@ -67,8 +87,8 @@ function getHours() {
   return faker.datatype.number({ min: 1, max: 2 }) * 60 * 60 * 1000 + getZeroOrThirtyMinutesInMillis();
 }
 
-function getDateTime(day: Date) {
-  const newHour = day.setUTCHours(faker.datatype.number({ min: 9, max: 15 }), 0, 0, 0);
+function getDateTime(day: Date, firstNine = false) {
+  const newHour = day.setUTCHours(firstNine ? 9 : faker.datatype.number({ min: 10, max: 15 }), 0, 0, 0);
   return new Date(newHour);
 }
 
