@@ -54,7 +54,6 @@ export function createActivities(activityLocations: ActivityLocation[], event: E
           openSeats,
         });
       } else {
-
         activitiesArray.push({
           startsAt: startHour,
           endsAt: endHour,

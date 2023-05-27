@@ -5,9 +5,16 @@ import hotelsSeed from './HotelsSeed';
 import roomsSeed from './RoomsandBookingsSeed';
 import { createActivities, getActivityLocations } from './ActivitySeed';
 
+import { redis, connectRedis } from '../src/config';
+import { eventCacheKey } from '../src/utils/constants/redis';
+
 const prisma = new PrismaClient();
 
 async function main() {
+  await connectRedis();
+  await redis.del(eventCacheKey);
+
+  await prisma.event.deleteMany();
   let event = await prisma.event.findFirst();
   if (!event) {
     event = await prisma.event.create({
@@ -97,14 +104,15 @@ async function main() {
     await roomsSeed.createRoomsandBookings(prisma, hotels);
   }
 
+  await prisma.activityLocation.deleteMany();
   let activityLocations = await prisma.activityLocation.findMany();
   if (!activityLocations.length) {
     await prisma.activityLocation.createMany({ data: getActivityLocations(event.id) });
     activityLocations = await prisma.activityLocation.findMany();
   }
 
+  await prisma.activity.deleteMany();
   const activities = await prisma.activity.findFirst();
-
   if (!activities) {
     await prisma.activity.createMany({
       data: createActivities(activityLocations, event),
@@ -127,4 +135,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await redis.disconnect();
   });
