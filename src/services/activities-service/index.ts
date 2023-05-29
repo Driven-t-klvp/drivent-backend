@@ -8,8 +8,6 @@ import { QueryDate } from '@/protocols';
 import { forBiddenError } from '@/errors/forbidden-error';
 
 async function listActivities(userId: number, selectedDate: QueryDate) {
-  if (!selectedDate) throw notFoundError();
-
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) {
     throw notFoundError();
@@ -17,7 +15,7 @@ async function listActivities(userId: number, selectedDate: QueryDate) {
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
 
   if (!ticket || ticket.status === 'RESERVED' || ticket.TicketType.fullActivityAccess) {
-    throw cannotListHotelsError();
+    throw cannotListHotelsError(); // bora criar um erro novo :eyes:
   }
 
   const minDate = getDateAccordinglyTime(selectedDate, 0, 0, 0);
@@ -25,7 +23,7 @@ async function listActivities(userId: number, selectedDate: QueryDate) {
 
   const activities = await activityRepository.findActivitiesByDate(minDate, maxDate, enrollment.id);
 
-  if (!activities.length) throw notFoundError();
+  // if (!activities.length) throw notFoundError(); // isso nao deveria ser um erro ne, so uma lista vazia
 
   const activitiesDividedByLocation = getActivitiesByLocations(activities);
 
@@ -119,4 +117,12 @@ async function listUserActivities(userId: number) {
   return activities;
 }
 
-export default { listActivities, listActivityLocation, subscribeActivity, unsubscribeActivity, listUserActivities };
+const activitiesService = {
+  listActivities,
+  listActivityLocation,
+  subscribeActivity,
+  unsubscribeActivity,
+  listUserActivities,
+};
+
+export default activitiesService;
