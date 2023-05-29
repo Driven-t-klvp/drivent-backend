@@ -5,6 +5,7 @@ import {
   listActivityLocations,
   subscribeActivity,
   unsubscribeActivity,
+  listUserActivities,
 } from '@/controllers/activities-contoller';
 
 const activitiesRouter = Router();
@@ -14,6 +15,7 @@ activitiesRouter
   .get('/', listActivities)
   .post('/', subscribeActivity)
   .delete('/ticketActivity/:id', unsubscribeActivity)
-  .get('/locations', listActivityLocations);
+  .get('/locations', listActivityLocations)
+  .get('/myActivities', listUserActivities);
 
 export { activitiesRouter };

@@ -94,6 +94,35 @@ function getActivitiesByLocations(activities: Array<Activity & { Tickets: Array<
   return hash;
 }
 
-const activitiesService = { listActivities, listActivityLocation, subscribeActivity, unsubscribeActivity };
+async function listUserActivities(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) {
+    throw notFoundError();
+  }
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
+
+  if (!ticket || ticket.status === 'RESERVED') {
+    throw forBiddenError();
+  }
+
+  if (ticket.TicketType.fullActivityAccess) {
+    const allActivities = await activityRepository.getAllActivities();
+    return allActivities;
+  }
+
+  const activities = await activityRepository.findActivitiesByUser(enrollment.id);
+
+  if (!activities.length) throw notFoundError();
+
+  return activities;
+}
+
+const activitiesService = {
+  listActivities,
+  listActivityLocation,
+  subscribeActivity,
+  unsubscribeActivity,
+  listUserActivities,
+};
 
 export default activitiesService;
