@@ -14,7 +14,7 @@ async function listActivities(userId: number, selectedDate: QueryDate) {
   }
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
 
-  if (!ticket || ticket.status === 'RESERVED') {
+  if (!ticket || ticket.status === 'RESERVED' || ticket.TicketType.fullActivityAccess) {
     throw cannotListHotelsError();
   }
 
