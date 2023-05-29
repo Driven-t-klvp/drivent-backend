@@ -15,7 +15,7 @@ async function listActivities(userId: number, selectedDate: QueryDate) {
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
 
   if (!ticket || ticket.status === 'RESERVED' || ticket.TicketType.fullActivityAccess) {
-    throw cannotListHotelsError();
+    throw cannotListHotelsError(); // bora criar um erro novo :eyes:
   }
 
   const minDate = getDateAccordinglyTime(selectedDate, 0, 0, 0);
