@@ -50,3 +50,14 @@ export async function unsubscribeActivity(req: AuthenticatedRequest, res: Respon
     next(error);
   }
 }
+
+export async function listUserActivities(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  const { userId } = req;
+
+  try {
+    const ticketActivity = await activitiesService.listUserActivities(userId);
+    return res.status(httpStatus.OK).send(ticketActivity);
+  } catch (error) {
+    next(error);
+  }
+}

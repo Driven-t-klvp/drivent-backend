@@ -114,6 +114,23 @@ async function deleteTicketActivity(id: number, activityId: number) {
   });
 }
 
+async function findActivitiesByUser(enrollmentId: number) {
+  return prisma.activity.findMany({
+    where: { Tickets: { some: { enrollmentId } } },
+    orderBy: {
+      startsAt: 'asc',
+    },
+  });
+}
+
+async function getAllActivities() {
+  return prisma.activity.findMany({
+    orderBy: {
+      startsAt: 'asc',
+    },
+  });
+}
+
 const activityRepository = {
   findActivitiesByDate,
   findActivityLocations,
@@ -124,6 +141,8 @@ const activityRepository = {
   incrementActivitySeats,
   findTicketActivity,
   searchConflicTicketActivities,
+  findActivitiesByUser,
+  getAllActivities,
 };
 
 export default activityRepository;
